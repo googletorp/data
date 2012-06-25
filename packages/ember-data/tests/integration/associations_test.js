@@ -25,45 +25,6 @@ module("Association/adapter integration test", {
   }
 });
 
-test("when adding a record to an association that belongs to another record that has not yet been saved, only the parent record is saved", function() {
-  expect(2);
-
-  var transaction = store.transaction();
-  var parentRecord = transaction.createRecord(Comment);
-  var childRecord = transaction.createRecord(Comment);
-
-  parentRecord.get('comments').pushObject(childRecord);
-
-  var createCalled = 0;
-  adapter.createRecord = function(store, type, record) {
-    createCalled++;
-    if (createCalled === 1) {
-      equal(record, parentRecord, "parent record is committed first");
-      store.didCreateRecord(record, { id: 1 });
-    } else if (createCalled === 2) {
-      equal(record, childRecord, "child record is committed after its parent is committed");
-    }
-  };
-
-  transaction.commit();
-});
-
-var async = function(callback, timeout) {
-  stop();
-
-  timeout = setTimeout(function() {
-    start();
-    ok(false, "Timeout was reached");
-  }, timeout || 100);
-
-  return function() {
-    clearTimeout(timeout);
-
-    start();
-    callback();
-  };
-};
-
 test("an association has an isLoaded flag that indicates whether the ManyArray has finished loaded", function() {
   expect(7);
 
