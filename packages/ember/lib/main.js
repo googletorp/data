@@ -3813,6 +3813,7 @@ Ember.run.cancelTimers = function () {
 */
 Ember.run.autorun = function() {
   if (!run.currentRunLoop) {
+    throw new Error("WAT");
     run.begin();
 
     if (!scheduledAutorun) {
